@@ -19,7 +19,7 @@ public class User implements Serializable {
     private String username;
 
     @NotBlank(message = "密码不能为空")
-    @Length(max = 50, message = "密码过长")
+    @Length(max = 60, message = "密码过长")
     private String password;
 
     @Length(max = 50, message = "昵称过长")

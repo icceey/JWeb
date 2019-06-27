@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TodoDao {
 
-    @Select("select * from todo where ownerId=#{owner}")
+    @Select("select * from todo where owner_id=#{owner}")
     List<Todo> getAllTodosByOwnerId(@Param("owner") Integer ownerId);
 
 
@@ -17,8 +17,8 @@ public interface TodoDao {
     void deleteTodoById(@Param("id") Integer id);
 
 
-    @Insert("insert into todo(title, content, ownerId, ownerType) " +
-            "values(#{title}, #{content}, #{ownerId}, #{ownerType})")
+    @Insert("insert into todo(title, content, owner_id, owner_type) " +
+            "values(#{title}, #{content}, #{owner_id}, #{owner_type})")
     void insertTodo(Todo todo);
 
 }

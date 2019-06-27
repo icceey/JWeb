@@ -3,9 +3,9 @@ package com.icceey.jweb.controller;
 import com.icceey.jweb.beans.BaseResponse;
 import com.icceey.jweb.beans.User;
 import com.icceey.jweb.service.UserService;
-import com.icceey.jweb.util.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -33,12 +33,12 @@ public class UserController {
         String password = mp.get("password");
 
         Set<ConstraintViolation<User>> set = validator.validate(new User(username, password));
-        log.info("[login] set: " + set.size());
+        log.info("[login] ConstraintViolationSetSize: " + set.size());
         if(!set.isEmpty()) return BaseResponse.fail(set.iterator().next().getMessage());
 
         User user = userService.findUserByUserName(username);
         if (user != null) {
-            if (MD5Util.encode(password, MD5Util.encode(username)).equals(user.getPassword())) {
+            if (BCrypt.checkpw(password, user.getPassword())) {
                 session.setAttribute(session.getId(), user);
                 log.info("[login] session-id: " + session.getId());
                 log.info("[login] user: " + session.getAttribute(session.getId()));
@@ -58,8 +58,7 @@ public class UserController {
         if(!set.isEmpty()) return BaseResponse.fail(set.iterator().next().getMessage());
 
         if (userService.findUserByUserName(username) == null) {
-            password = MD5Util.encode(password, MD5Util.encode(username));
-            userService.insertUser(new User(username, password));
+            userService.insertUser(new User(username, BCrypt.hashpw(password, BCrypt.gensalt())));
             return BaseResponse.success("注册成功");
         } else return BaseResponse.fail("用户名已存在");
     }
