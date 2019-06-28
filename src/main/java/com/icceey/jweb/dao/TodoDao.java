@@ -17,8 +17,8 @@ public interface TodoDao {
     void deleteTodoById(@Param("id") Integer id);
 
 
-    @Insert("insert into todo(title, content, owner_id, owner_type) " +
-            "values(#{title}, #{content}, #{owner_id}, #{owner_type})")
+    @Insert("insert into todo(title, content, owner_id, owner_type, datetime) " +
+            "values(#{title}, #{content}, #{ownerId}, #{ownerType}, #{datetime})")
     void insertTodo(Todo todo);
 
 }

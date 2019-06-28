@@ -19,7 +19,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         User user = (User) session.getAttribute(session.getId());
         if(user == null) {
             PrintWriter writer = response.getWriter();
-            writer.write(JSON.toJSONString(BaseResponse.sessionExpires()));
+            writer.write(JSON.toJSONString(BaseResponse.authFailed()));
             return false;
         }
         return true;

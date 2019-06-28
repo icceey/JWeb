@@ -41,8 +41,8 @@ public class BaseResponse {
         return new BaseResponse(ResponseStatus.FAIL, msg);
     }
 
-    public static BaseResponse sessionExpires() {
-        return new BaseResponse(ResponseStatus.SESSION_EXPIRE, "session expires");
+    public static BaseResponse authFailed() {
+        return new BaseResponse(ResponseStatus.AUTH_FAILED, "Auth failed");
     }
 
     public static BaseResponse exception() {

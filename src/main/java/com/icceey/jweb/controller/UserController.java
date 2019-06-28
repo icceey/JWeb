@@ -6,12 +6,18 @@ import com.icceey.jweb.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -28,17 +34,14 @@ public class UserController {
 
 
     @RequestMapping("/login")
-    public BaseResponse login(@RequestBody HashMap<String, String> mp, HttpSession session) {
-        String username = mp.get("username");
-        String password = mp.get("password");
-
-        Set<ConstraintViolation<User>> set = validator.validate(new User(username, password));
+    public BaseResponse login(@RequestBody User loginUser, HttpSession session) {
+        Set<ConstraintViolation<User>> set = validator.validate(loginUser, User.Login.class);
         log.info("[login] ConstraintViolationSetSize: " + set.size());
         if(!set.isEmpty()) return BaseResponse.fail(set.iterator().next().getMessage());
 
-        User user = userService.findUserByUserName(username);
+        User user = userService.findUserByUserName(loginUser.getUsername());
         if (user != null) {
-            if (BCrypt.checkpw(password, user.getPassword())) {
+            if (BCrypt.checkpw(loginUser.getPassword(), user.getPassword())) {
                 session.setAttribute(session.getId(), user);
                 log.info("[login] session-id: " + session.getId());
                 log.info("[login] user: " + session.getAttribute(session.getId()));
@@ -50,17 +53,56 @@ public class UserController {
 
 
     @RequestMapping("/register")
-    public BaseResponse register(@RequestBody HashMap<String, String> mp) {
-        String username = mp.get("username");
-        String password = mp.get("password");
+    public BaseResponse register(@RequestBody User regUser) {
 
-        Set<ConstraintViolation<User>> set = validator.validate(new User(username, password));
+        Set<ConstraintViolation<User>> set = validator.validate(regUser, User.Register.class);
         if(!set.isEmpty()) return BaseResponse.fail(set.iterator().next().getMessage());
 
-        if (userService.findUserByUserName(username) == null) {
-            userService.insertUser(new User(username, BCrypt.hashpw(password, BCrypt.gensalt())));
+        if (userService.findUserByUserName(regUser.getUsername()) == null) {
+            userService.insertUser(regUser.setPassword(BCrypt.hashpw(regUser.getPassword(), BCrypt.gensalt())));
             return BaseResponse.success("注册成功");
         } else return BaseResponse.fail("用户名已存在");
+    }
+
+
+    @RequestMapping("/profile/update")
+    public BaseResponse updateUserInfo(@RequestBody HashMap<String, String> mp, HttpSession session) {
+        User user = (User) session.getAttribute(session.getId());
+        user.setNickname(mp.get("nickname"))
+                .setMail(mp.get("mail"))
+                .setPhone(mp.get("phone"));
+
+        Set<ConstraintViolation<User>> set = validator.validate(user, User.Profile.class);
+        if(!set.isEmpty()) return BaseResponse.fail(set.iterator().next().getMessage());
+
+        userService.updateUserInfo(user);
+        session.setAttribute(session.getId(), user);
+        return BaseResponse.success().put("user", user);
+
+    }
+
+
+    @RequestMapping("/avatar/update")
+    public BaseResponse updateAvatar(@RequestParam("avatar") @NotNull MultipartFile file, HttpSession session) throws IOException {
+        User user = (User) session.getAttribute(session.getId());
+
+        String msg = null;
+        String orgName = file.getOriginalFilename();
+        if(!Objects.requireNonNull(file.getContentType()).startsWith("image")) msg = "文件格式不支持";
+        else if(file.getSize() > 5*1024*1024) msg = "图片不能大于5M";
+        else if(orgName == null || orgName.isEmpty()) msg = "文件格式不合法";
+        if(msg != null) return BaseResponse.fail(msg);
+
+        String path = ResourceUtils.getURL("classpath:").getPath() + "user/avatar/";
+        String name = user.getUsername() + "-" + System.currentTimeMillis();
+        String suffix = orgName.substring(orgName.lastIndexOf("."));
+
+        userService.updateUserAvatar(user.setAvatar(name+suffix));
+        session.setAttribute(session.getId(), user);
+
+        file.transferTo(new File(path + name + suffix));
+
+        return BaseResponse.success();
     }
 
 
@@ -71,13 +113,10 @@ public class UserController {
     }
 
 
-    @RequestMapping("/userinfo")
+    @RequestMapping("/profile")
     public BaseResponse getUser(HttpSession session)  {
         User user = (User) session.getAttribute(session.getId());
-        if(user != null) {
-            return BaseResponse.success().put("user", user);
-        }
-        return BaseResponse.fail();
+        return BaseResponse.success().put("user", user);
     }
 
 
