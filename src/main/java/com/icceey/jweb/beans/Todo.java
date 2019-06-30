@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
@@ -13,12 +14,17 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
+@Entity
+@Table(name = "todo")
 public class Todo implements Serializable {
 
-    private Integer id;
-    private Integer ownerId;
-    private Integer ownerType;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
+    private Long ownerId;
+
+    private Integer ownerType;
 
     @NotBlank(message = "标题不能为空")
     @Length(max = 20, message = "标题过长")
@@ -28,5 +34,7 @@ public class Todo implements Serializable {
     private String content;
 
     private Date datetime;
+
+    private boolean done;
 
 }

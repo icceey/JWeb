@@ -36,7 +36,6 @@ public class UserController {
     @RequestMapping("/login")
     public BaseResponse login(@RequestBody User loginUser, HttpSession session) {
         Set<ConstraintViolation<User>> set = validator.validate(loginUser, User.Login.class);
-        log.info("[login] ConstraintViolationSetSize: " + set.size());
         if(!set.isEmpty()) return BaseResponse.fail(set.iterator().next().getMessage());
 
         User user = userService.findUserByUserName(loginUser.getUsername());
@@ -59,7 +58,8 @@ public class UserController {
         if(!set.isEmpty()) return BaseResponse.fail(set.iterator().next().getMessage());
 
         if (userService.findUserByUserName(regUser.getUsername()) == null) {
-            userService.insertUser(regUser.setPassword(BCrypt.hashpw(regUser.getPassword(), BCrypt.gensalt())));
+            userService.saveUser(regUser.setPassword(BCrypt.hashpw(regUser.getPassword(), BCrypt.gensalt())));
+            log.info("[register] " + regUser);
             return BaseResponse.success("注册成功");
         } else return BaseResponse.fail("用户名已存在");
     }
@@ -75,8 +75,9 @@ public class UserController {
         Set<ConstraintViolation<User>> set = validator.validate(user, User.Profile.class);
         if(!set.isEmpty()) return BaseResponse.fail(set.iterator().next().getMessage());
 
-        userService.updateUserInfo(user);
+        userService.saveUser(user);
         session.setAttribute(session.getId(), user);
+        log.info("[update user info] " + user);
         return BaseResponse.success().put("user", user);
 
     }
@@ -86,6 +87,7 @@ public class UserController {
     public BaseResponse updateAvatar(@RequestParam("avatar") @NotNull MultipartFile file, HttpSession session) throws IOException {
         User user = (User) session.getAttribute(session.getId());
 
+        log.info("[update avatar] user:" + user.getUsername() + " file-type:" + file.getContentType() + " size:" + file.getSize() + " ");
         String msg = null;
         String orgName = file.getOriginalFilename();
         if(!Objects.requireNonNull(file.getContentType()).startsWith("image")) msg = "文件格式不支持";
@@ -97,7 +99,7 @@ public class UserController {
         String name = user.getUsername() + "-" + System.currentTimeMillis();
         String suffix = orgName.substring(orgName.lastIndexOf("."));
 
-        userService.updateUserAvatar(user.setAvatar(name+suffix));
+        userService.saveUser(user.setAvatar(name+suffix));
         session.setAttribute(session.getId(), user);
 
         file.transferTo(new File(path + name + suffix));

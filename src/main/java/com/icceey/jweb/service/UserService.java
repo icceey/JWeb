@@ -1,41 +1,18 @@
 package com.icceey.jweb.service;
 
 import com.icceey.jweb.beans.User;
-import com.icceey.jweb.dao.UserDao;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-public class UserService {
 
-    @Autowired
-    private UserDao userDao;
+public interface UserService {
 
-    public User findUserById(Integer id) {
-        return userDao.findUserById(id);
-    }
+    User findUserById(Long id);
 
+    User findUserByUserName(String username);
 
-    public User findUserByUserName(String username) {
-        return userDao.findUserByUserName(username);
-    }
+    List<User> getAllUser();
 
-    public List<User> getAllUser() {
-        return userDao.getAllUser();
-    }
-
-    public void insertUser(User user) {
-        userDao.insert(user);
-    }
-
-    public void updateUserInfo(User user) {
-        userDao.updateUserInfo(user);
-    }
-
-    public void updateUserAvatar(User user) {
-        userDao.updateUserAvatar(user);
-    }
+    void saveUser(User user);
 
 }

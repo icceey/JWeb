@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
+import javax.persistence.*;
 import javax.validation.GroupSequence;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -16,11 +17,15 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
+@Entity
+@Table(name = "user")
 public class User implements Serializable {
 
     @NotNull
     @Range
-    private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @NotBlank(groups = {Login.class}, message = "用户名不能为空")
     @Length(groups = {Login.class}, max = 20, message = "用户名过长")
@@ -42,6 +47,9 @@ public class User implements Serializable {
 
     @Length(groups = {Profile.class}, max = 15, message = "手机号过长")
     private String phone;
+
+
+    private Integer type;
 
 
     public User(String username, String password) {
