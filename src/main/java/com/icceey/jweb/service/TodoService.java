@@ -1,17 +1,17 @@
 package com.icceey.jweb.service;
 
 import com.icceey.jweb.beans.Todo;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 public interface TodoService {
 
-    List<Todo> getAllUndoByOwnerId(Long ownerId);
+    Page<Todo> getAllUndoByOwnerId(Long ownerId, Pageable pageable);
 
-    List<Todo> getAllDoneByOwnerId(Long ownerId);
+    Page<Todo> getAllDoneByOwnerId(Long ownerId, Pageable pageable);
 
-    List<Todo> getAllTodosByOwnerId(Long ownerId);
+    Page<Todo> getAllTodosByOwnerId(Long ownerId, Pageable pageable);
 
     void deleteTodoById(Long id);
 

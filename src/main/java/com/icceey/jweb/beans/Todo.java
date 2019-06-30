@@ -19,7 +19,7 @@ import java.util.Date;
 public class Todo implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long ownerId;

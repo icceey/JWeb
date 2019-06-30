@@ -3,10 +3,11 @@ package com.icceey.jweb.service;
 import com.icceey.jweb.beans.Todo;
 import com.icceey.jweb.repository.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 
 @Service
@@ -17,20 +18,20 @@ public class TodoServiceImpl implements TodoService {
 
 
     @Override
-    public List<Todo> getAllUndoByOwnerId(Long ownerId) {
-        return todoRepository.findAllByOwnerIdAndDoneFalse(ownerId);
+    public Page<Todo> getAllUndoByOwnerId(Long ownerId, Pageable pageable) {
+        return todoRepository.findAllByOwnerIdAndDoneFalse(ownerId, pageable);
     }
 
 
     @Override
-    public List<Todo> getAllDoneByOwnerId(Long ownerId) {
-        return todoRepository.findAllByOwnerIdAndDoneTrue(ownerId);
+    public Page<Todo> getAllDoneByOwnerId(Long ownerId, Pageable pageable) {
+        return todoRepository.findAllByOwnerIdAndDoneTrue(ownerId, pageable);
     }
 
 
     @Override
-    public List<Todo> getAllTodosByOwnerId(Long ownerId) {
-        return todoRepository.findAllByOwnerId(ownerId);
+    public Page<Todo> getAllTodosByOwnerId(Long ownerId, Pageable pageable) {
+        return todoRepository.findAllByOwnerId(ownerId, pageable);
     }
 
 

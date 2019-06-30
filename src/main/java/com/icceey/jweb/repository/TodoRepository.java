@@ -1,17 +1,17 @@
 package com.icceey.jweb.repository;
 
 import com.icceey.jweb.beans.Todo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
-
-import java.util.List;
 
 public interface TodoRepository extends CrudRepository<Todo, Long> {
 
-    List<Todo> findAllByOwnerId(Long ownerId);
+    Page<Todo> findAllByOwnerId(Long ownerId, Pageable pageable);
 
-    List<Todo> findAllByOwnerIdAndDoneTrue(Long ownerId);
+    Page<Todo> findAllByOwnerIdAndDoneTrue(Long ownerId, Pageable pageable);
 
-    List<Todo> findAllByOwnerIdAndDoneFalse(Long ownerId);
+    Page<Todo> findAllByOwnerIdAndDoneFalse(Long ownerId, Pageable pageable);
 
 
 }

@@ -24,7 +24,7 @@ public class User implements Serializable {
     @NotNull
     @Range
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(groups = {Login.class}, message = "用户名不能为空")

@@ -7,10 +7,10 @@ import com.icceey.jweb.constants.OwnerType;
 import com.icceey.jweb.service.TodoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolation;
@@ -29,28 +29,42 @@ public class TodoController {
     @Autowired
     private Validator validator;
 
+    private final int pageSize = 12;
+
 
     @RequestMapping("/all")
-    public BaseResponse getTodos(HttpSession session) {
+    public BaseResponse getTodos(@RequestParam("page") Integer page, HttpSession session) {
         User user = (User) session.getAttribute(session.getId());
-        List<Todo> todos = todoService.getAllTodosByOwnerId(user.getId());
-        return BaseResponse.success().put("todos", todos);
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<Todo> pages = todoService.getAllTodosByOwnerId(user.getId(), pageable);
+        Integer totalPages = pages.getTotalPages();
+        List<Todo> todos = new ArrayList<>();
+        for(Todo t : pages) todos.add(t);
+        return BaseResponse.success().put("tot", totalPages).put("todos", todos);
     }
 
 
     @RequestMapping("/all/undo")
-    public BaseResponse getUndo(HttpSession session) {
+    public BaseResponse getUndo(@RequestParam("page") Integer page, HttpSession session) {
         User user = (User) session.getAttribute(session.getId());
-        List<Todo> todos = todoService.getAllUndoByOwnerId(user.getId());
-        return BaseResponse.success().put("todos", todos);
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<Todo> pages = todoService.getAllUndoByOwnerId(user.getId(), pageable);
+        Integer totalPages = pages.getTotalPages();
+        List<Todo> todos = new ArrayList<>();
+        for(Todo t : pages) todos.add(t);
+        return BaseResponse.success().put("tot", totalPages).put("todos", todos);
     }
 
 
     @RequestMapping("/all/done")
-    public BaseResponse getDone(HttpSession session) {
+    public BaseResponse getDone(@RequestParam("page") Integer page, HttpSession session) {
         User user = (User) session.getAttribute(session.getId());
-        List<Todo> todos = todoService.getAllDoneByOwnerId(user.getId());
-        return BaseResponse.success().put("todos", todos);
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<Todo> pages = todoService.getAllDoneByOwnerId(user.getId(), pageable);
+        Integer totalPages = pages.getTotalPages();
+        List<Todo> todos = new ArrayList<>();
+        for(Todo t : pages) todos.add(t);
+        return BaseResponse.success().put("tot", totalPages).put("todos", todos);
     }
 
 
