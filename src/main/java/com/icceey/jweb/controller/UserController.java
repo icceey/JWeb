@@ -2,6 +2,7 @@ package com.icceey.jweb.controller;
 
 import com.icceey.jweb.beans.BaseResponse;
 import com.icceey.jweb.beans.User;
+import com.icceey.jweb.constants.UserType;
 import com.icceey.jweb.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,14 +55,33 @@ public class UserController {
     @RequestMapping("/register")
     public BaseResponse register(@RequestBody User regUser) {
 
-        Set<ConstraintViolation<User>> set = validator.validate(regUser, User.Register.class);
+        log.info("[register] " + regUser);
+
+        Set<ConstraintViolation<User>> set = validator.validate(regUser, User.Login.class);
         if(!set.isEmpty()) return BaseResponse.fail(set.iterator().next().getMessage());
 
         if (userService.findUserByUserName(regUser.getUsername()) == null) {
-            userService.saveUser(regUser.setPassword(BCrypt.hashpw(regUser.getPassword(), BCrypt.gensalt())));
+            regUser.setPassword(BCrypt.hashpw(regUser.getPassword(), BCrypt.gensalt()));
+            userService.saveUser(regUser.setType(UserType.USER));
             log.info("[register] " + regUser);
             return BaseResponse.success("注册成功");
         } else return BaseResponse.fail("用户名已存在");
+    }
+
+
+    @RequestMapping("/update/password")
+    public BaseResponse changePassword(@RequestBody HashMap<String, String> mp, HttpSession session) {
+        User user = (User) session.getAttribute(session.getId());
+        String orgPassword = mp.get("password");
+        String password = mp.get("newPassword");
+
+        if(BCrypt.checkpw(orgPassword, user.getPassword())) {
+            user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+            userService.saveUser(user);
+            session.setAttribute(session.getId(), user);
+            return BaseResponse.success();
+        } else return BaseResponse.fail("密码错误");
+
     }
 
 

@@ -10,7 +10,6 @@ import javax.persistence.*;
 import javax.validation.GroupSequence;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 
@@ -21,8 +20,6 @@ import java.io.Serializable;
 @Table(name = "user")
 public class User implements Serializable {
 
-    @NotNull
-    @Range
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,7 +45,6 @@ public class User implements Serializable {
     @Length(groups = {Profile.class}, max = 15, message = "手机号过长")
     private String phone;
 
-
     private Integer type;
 
 
@@ -60,8 +56,8 @@ public class User implements Serializable {
 
     public interface Login { }
 
-    @GroupSequence({Login.class, Profile.class})
-    public interface Register{ }
+//    @GroupSequence({Login.class, Profile.class})
+//    public interface Register{ }
 
     public interface Profile{ }
 
