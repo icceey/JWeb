@@ -32,9 +32,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllUser() {
         List<User> res = new ArrayList<>();
-        for(User user : userRepository.findAll()) {
-            res.add(user);
-        }
+        userRepository.findAll().forEach(res::add);
         return res;
     }
 
@@ -45,4 +43,10 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+
+    @Transactional
+    @Override
+    public void deleteUser(User user) {
+        userRepository.deleteById(user.getId());
+    }
 }

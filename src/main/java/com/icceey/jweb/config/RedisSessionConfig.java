@@ -6,7 +6,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 
 
 @Configuration
-@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 1800)
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 3600)
 public class RedisSessionConfig {
 
 

@@ -91,7 +91,8 @@ public class TodoController {
         todo.setOwnerId(user.getId()).setOwnerType(OwnerType.USER);
         todoService.saveTodo(todo);
 
-        return BaseResponse.success();
+        log.info("[add todo] " + todo);
+        return BaseResponse.success().put("todo", todo);
     }
 
 
@@ -111,7 +112,7 @@ public class TodoController {
         todoService.saveTodo(todo);
         log.info("[update todo] new:" + todo);
 
-        return BaseResponse.success();
+        return BaseResponse.success().put("todo", todo);
     }
 
 

@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -124,7 +125,7 @@ public class UserController {
 
         file.transferTo(new File(path + name + suffix));
 
-        return BaseResponse.success();
+        return BaseResponse.success().put("user", user);
     }
 
 
@@ -139,6 +140,57 @@ public class UserController {
     public BaseResponse getUser(HttpSession session)  {
         User user = (User) session.getAttribute(session.getId());
         return BaseResponse.success().put("user", user);
+    }
+
+
+    @RequestMapping("/all")
+    public BaseResponse getAllUser(HttpSession session) {
+        User user = (User) session.getAttribute(session.getId());
+
+        if(user.getType() >= UserType.ADMIN) {
+            List<User> userList = userService.getAllUser();
+            return BaseResponse.success().put("users", userList);
+        } else {
+            return BaseResponse.fail("权限不足");
+        }
+
+    }
+
+
+    @RequestMapping("/delete/{id}")
+    public BaseResponse deleteUser(@PathVariable("id") Long id, HttpSession session) {
+        User user = (User) session.getAttribute(session.getId());
+
+        User dUser = userService.findUserById(id);
+        if(dUser == null) return BaseResponse.fail("用户不存在");
+        if(user.getId().equals(dUser.getId())) return BaseResponse.fail("不可以删除自己哦");
+
+        if(user.getType() >= dUser.getType()) {
+            userService.deleteUser(dUser);
+            log.info("[delete user] user [" + dUser.getUsername() + "] delete by [" + user.getUsername() + "]");
+            return BaseResponse.success();
+        } else {
+            return BaseResponse.fail("权限不足");
+        }
+    }
+
+
+    @RequestMapping("/update/type/{id}/{type}")
+    public BaseResponse updateUserType(@PathVariable("id") Long id, @PathVariable("type") Integer type, HttpSession session) {
+        User user = (User) session.getAttribute(session.getId());
+
+        User dUser = userService.findUserById(id);
+        if(dUser == null) return BaseResponse.fail("用户不存在");
+        if(user.getId().equals(dUser.getId())) return BaseResponse.fail("不可以操作自己哦");
+
+        if(user.getType() >= dUser.getType() && user.getType() >= type) {
+            dUser.setType(type);
+            userService.saveUser(dUser);
+            log.info("[update user] user [" + dUser.getUsername() + "] change by [" + user.getUsername() + "] to " + dUser.getType());
+            return BaseResponse.success();
+        } else {
+            return BaseResponse.fail("权限不足");
+        }
     }
 
 
