@@ -3,6 +3,8 @@ package com.icceey.jweb.service;
 import com.icceey.jweb.beans.User;
 import com.icceey.jweb.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -30,10 +32,8 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<User> getAllUser() {
-        List<User> res = new ArrayList<>();
-        userRepository.findAll().forEach(res::add);
-        return res;
+    public Page<User> getAllUser(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
 

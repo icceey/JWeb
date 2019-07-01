@@ -39,7 +39,7 @@ public class TodoController {
         Page<Todo> pages = todoService.getAllTodosByOwnerId(user.getId(), pageable);
         Integer totalPages = pages.getTotalPages();
         List<Todo> todos = new ArrayList<>();
-        for(Todo t : pages) todos.add(t);
+        pages.forEach(todos::add);
         return BaseResponse.success().put("tot", totalPages).put("todos", todos);
     }
 
@@ -51,7 +51,7 @@ public class TodoController {
         Page<Todo> pages = todoService.getAllUndoByOwnerId(user.getId(), pageable);
         Integer totalPages = pages.getTotalPages();
         List<Todo> todos = new ArrayList<>();
-        for(Todo t : pages) todos.add(t);
+        pages.forEach(todos::add);
         return BaseResponse.success().put("tot", totalPages).put("todos", todos);
     }
 
@@ -63,7 +63,7 @@ public class TodoController {
         Page<Todo> pages = todoService.getAllDoneByOwnerId(user.getId(), pageable);
         Integer totalPages = pages.getTotalPages();
         List<Todo> todos = new ArrayList<>();
-        for(Todo t : pages) todos.add(t);
+        pages.forEach(todos::add);
         return BaseResponse.success().put("tot", totalPages).put("todos", todos);
     }
 

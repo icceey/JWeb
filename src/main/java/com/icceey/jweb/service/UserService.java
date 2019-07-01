@@ -1,8 +1,8 @@
 package com.icceey.jweb.service;
 
 import com.icceey.jweb.beans.User;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 public interface UserService {
@@ -11,7 +11,7 @@ public interface UserService {
 
     User findUserByUserName(String username);
 
-    List<User> getAllUser();
+    Page<User> getAllUser(Pageable pageable);
 
     void saveUser(User user);
 

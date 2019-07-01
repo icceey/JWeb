@@ -6,6 +6,9 @@ import com.icceey.jweb.constants.UserType;
 import com.icceey.jweb.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +20,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 
 @RestController
@@ -33,6 +33,8 @@ public class UserController {
 
     @Autowired
     private Validator validator;
+
+    private final int pageSize = 12;
 
 
     @RequestMapping("/login")
@@ -144,12 +146,17 @@ public class UserController {
 
 
     @RequestMapping("/all")
-    public BaseResponse getAllUser(HttpSession session) {
+    public BaseResponse getAllUser(@RequestParam("page") Integer page, HttpSession session) {
         User user = (User) session.getAttribute(session.getId());
 
         if(user.getType() >= UserType.ADMIN) {
-            List<User> userList = userService.getAllUser();
-            return BaseResponse.success().put("users", userList);
+            Pageable pageable = PageRequest.of(page, pageSize);
+            Page<User> pages = userService.getAllUser(pageable);
+            List<User> users = new ArrayList<>();
+            pages.forEach(users::add);
+            return BaseResponse.success()
+                    .put("tot", pages.getTotalPages())
+                    .put("users", users);
         } else {
             return BaseResponse.fail("权限不足");
         }
