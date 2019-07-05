@@ -64,7 +64,8 @@ public class UserController {
         if(!set.isEmpty()) return BaseResponse.fail(set.iterator().next().getMessage());
 
         if (userService.findUserByUserName(regUser.getUsername()) == null) {
-            regUser.setPassword(BCrypt.hashpw(regUser.getPassword(), BCrypt.gensalt()));
+            regUser.setPassword(BCrypt.hashpw(regUser.getPassword(), BCrypt.gensalt()))
+                    .setAvatar("avatar.jpeg");
             userService.saveUser(regUser.setType(UserType.USER));
             log.info("[register] " + regUser);
             return BaseResponse.success("注册成功");

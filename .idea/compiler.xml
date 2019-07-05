@@ -9,7 +9,7 @@
         <module name="jweb" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="8">
       <module name="jweb" target="1.8" />
     </bytecodeTargetLevel>
   </component>
